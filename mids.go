@@ -40,7 +40,7 @@ func Delete(pattern string, handler http.HandlerFunc) {
 
 func execIfNotNil(fn http.HandlerFunc, w http.ResponseWriter, r *http.Request) {
 	if fn == nil {
-		fmt.Fprintf(w, "page not found")
+		fmt.Fprintf(w, "404 page not found")
 		return
 	}
 	fn(w,r)
@@ -48,18 +48,22 @@ func execIfNotNil(fn http.HandlerFunc, w http.ResponseWriter, r *http.Request) {
 
 func ListenAndServe(port string) {
 	for pattern, handlers := range endpoints {
+		get := handlers.get
+		put := handlers.put
+		post := handlers.post
+		delete := handlers.delete
 		fn := func(w http.ResponseWriter,r *http.Request) {
 			switch r.Method {
 			case http.MethodGet:
-				execIfNotNil(handlers.get,w,r)
+				execIfNotNil(get,w,r)
 			case http.MethodPut:
-				execIfNotNil(handlers.put,w,r)
+				execIfNotNil(put,w,r)
 			case http.MethodPost:
-				execIfNotNil(handlers.post,w,r)
+				execIfNotNil(post,w,r)
 			case http.MethodDelete:
-				execIfNotNil(handlers.delete,w,r)
+				execIfNotNil(delete,w,r)
 			default:
-				fmt.Fprintf(w,"woops")
+				fmt.Fprintf(w,"404 page not found")
 			}
 
 		}
